@@ -1,0 +1,13 @@
+.settings/
+.project
+.buildpath
+
+build/generated
+vendor/
+
+node_modules/
+npm-debug.log
+
+config/api.yml
+config/propel.yml
+api/wine-tasting.db

@@ -1,0 +1,15 @@
+{
+  "name": "wine-tasting",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Web app to rate wines during a wine tasting party.",
+  "scripts": {
+      "postinstall": "node ./build/postinstall.js",
+      "start": "node ./build/start.js",
+      "api": "node ./build/api.js",
+      "build": "node ./build/build.js"
+  },
+  "devDependencies": {
+
+  }
+}

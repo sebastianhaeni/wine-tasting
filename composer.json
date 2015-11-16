@@ -1,0 +1,35 @@
+{
+    "name": "sebastianhaeni/wine-tasting",
+    "authors": [
+        {
+            "name": "Sebastian Häni",
+            "email": "haeni.Sebastian@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type":"package",
+            "package": {
+              "name": "Antnee/phpPasswordHashingLib",
+              "version":"master",
+              "source": {
+                  "url": "https://github.com/Antnee/phpPasswordHashingLib.git",
+                  "type": "git",
+                  "reference":"master"
+                }
+            }
+        }
+    ],
+    "require": {
+        "php": ">=5.5",
+        "Antnee/phpPasswordHashingLib": "master",
+        "silex/silex": "^1.3",
+        "doctrine/dbal": "^2.5",
+        "propel/propel": "^2.0@alpha",
+        "propel/propel-service-provider": "^0.0.2"
+    },
+    "autoload": {
+        "psr-4": {"WineTasting\\": "api/WineTasting"}
+    }
+}

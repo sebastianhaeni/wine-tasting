@@ -1,0 +1,10 @@
+propel:
+    database:
+        connections:
+            default:
+                adapter: sqlite
+                dsn: sqlite:api/wine-tasting.db
+                user: root
+                password:
+                settings:
+                    charset: utf8
