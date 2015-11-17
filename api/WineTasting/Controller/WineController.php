@@ -22,73 +22,83 @@ class WineController extends BaseController
     {
         $wines = WineQuery::create()->find();
         $dtos = [ ];
-
+        
         foreach ($wines as $wine) {
             $dtos [] = $this->createWineDto($wine);
         }
-
+        
+        usort($dtos, "WineController::compareWine");
+        
         return $this->json($dtos);
+    }
+
+    private static function compareWine($a, $b)
+    {
+        if ($a ['points'] == $b ['points']) {
+            return 0;
+        }
+        return ($a ['points'] < $b ['points']) ? - 1 : 1;
     }
 
     public function getRankedWines(Request $request, Application $app)
     {
-        $wines = WineQuery::create()->orderByName()->find();
+        $wines = WineQuery::create()->find();
         $dtos = [ ];
-    
+        
         foreach ($wines as $wine) {
             $dtos [] = $this->createWineDto($wine);
         }
-    
+        
         return $this->json($dtos);
     }
 
     public function getWine(Application $app, $id)
     {
         $wine = (new WineQuery())->findPk($id);
-
+        
         if ($wine === null) {
-            return $this->json([
-                'status' => 'not found'
+            return $this->json([ 
+                'status' => 'not found' 
             ]);
         }
-
+        
         return $this->json($this->createWineDto((new WineQuery())->findPk($id)));
     }
 
     public function create(Request $request, Application $app)
     {
         $file = $request->files->get('picture');
-
+        
         if ($file === null) {
-            return $this->json([
-                'status' => 'picture missing'
+            return $this->json([ 
+                'status' => 'picture missing' 
             ]);
         }
-
+        
         $path = __DIR__ . '/../../../www/upload/';
-
+        
         $originalFilename = $file->getClientOriginalName();
         $ext = strtolower(substr($originalFilename, strrpos($originalFilename, '.')));
         $filename = uniqid() . $ext;
         $file->move($path, $filename);
-
+        
         $username = $request->get('username');
         $user = UserQuery::create()->findOneByName($username);
-        if($user == null){
+        if ($user == null) {
             $user = new User();
             $user->setName($username);
             $user->save();
         }
-
+        
         $wine = new Wine();
         $wine->setName($request->get('name'));
         $wine->setSubmitter($user->getIdUser());
         $wine->setYear($request->get('year'));
         $wine->setPicture($filename);
         $wine->save();
-
-        return $this->json([
-            'id' => $wine->getIdWine()
+        
+        return $this->json([ 
+            'id' => $wine->getIdWine() 
         ]);
     }
 
@@ -96,7 +106,7 @@ class WineController extends BaseController
     {
         $idUser = $request->get('idUser');
         $idWine = $request->get('idWine');
-
+        
         $user = UserQuery::create()->findOneByIdUser($idUser);
         $user->setVote1(empty($idWine) ? null : $idWine);
         $user->save();
@@ -107,7 +117,7 @@ class WineController extends BaseController
     {
         $idUser = $request->get('idUser');
         $idWine = $request->get('idWine');
-
+        
         $user = UserQuery::create()->findOneByIdUser($idUser);
         $user->setVote2(empty($idWine) ? null : $idWine);
         $user->save();
@@ -127,13 +137,13 @@ class WineController extends BaseController
     private function createWineDto(Wine $wine)
     {
         $submitter = UserQuery::create()->findOneByIdUser($wine->getSubmitter());
-        return [
+        return [ 
             'id' => $wine->getIdWine(),
             'name' => $wine->getName(),
             'submitter' => $submitter->getName(),
             'points' => $this->calculatePoints($wine),
             'picture' => $wine->getPicture(),
-            'year' => $wine->getYear()
+            'year' => $wine->getYear() 
         ];
     }
 

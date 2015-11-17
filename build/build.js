@@ -11,4 +11,4 @@ require('./api/propel-config');
 // Generating propel models
 execPropel(['model:build']);
 // Generate static js resources
-childProcess.execFileSync('gulp');
+//childProcess.execFileSync('gulp');

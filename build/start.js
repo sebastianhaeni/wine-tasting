@@ -4,4 +4,4 @@
  */
 
 require('./api');
-require('./frontend');
+//require('./frontend');

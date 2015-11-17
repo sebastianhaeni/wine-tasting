@@ -1,5 +1,5 @@
-const API = 'http://localhost:3001/v1/';
-const IMG = 'http://localhost:3000/upload/';
+const API = '/api/v1/';
+const IMG = '/upload/';
 
 if($('#welcome-page').length === 1 && localStorage.getItem('idUser') !== null){
     window.location = 'voting.html';
