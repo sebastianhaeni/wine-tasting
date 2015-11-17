@@ -1,0 +1,10 @@
+img {
+  max-width: 100%; }
+
+.welcome {
+  font-size: 25px;
+  margin: 10px; }
+
+.fix-pos {
+  margin-top: -6px;
+  margin-right: -12px; }

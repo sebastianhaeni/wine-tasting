@@ -18,6 +18,7 @@
     "gulp-nunjucks-render": "^1.0.0",
     "gulp-sass": "^2.1.0",
     "gulp-util": "^3.0.7",
+    "open": "0.0.5",
     "run-sequence": "^1.1.4",
     "strictify": "^0.2.0",
     "vinyl-buffer": "^1.0.0",

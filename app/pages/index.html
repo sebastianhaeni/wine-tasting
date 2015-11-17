@@ -1,7 +1,20 @@
-{% extends "layout.html" %}
+{% extends "welcome.html" %}
 
 {% block nav_home %}active{% endblock %}
 
 {% block content %}
-    <h1>Ha</h1>
+    <img src="images/logo.jpg" alt="Logo"><br>
+    <br id="welcome-page">
+    Hoi!<br>
+    Cool hesch chöne cho a üsi Wiimäss i de Laubegg WG. Es freut us mega, dass du da bisch. <br>
+    <br>
+    Aber, säg nomau die Name
+    bitte, ha ne grad vergässe...
+    <form id="user-form">
+        <div class="form-group">
+            <input type="text" name="user-name" id="user-name" class="form-control" required minlength="3">
+        </div>
+
+        <input type="submit" value="Ja, das bini!" class="btn btn-primary">
+    </form>
 {% endblock %}

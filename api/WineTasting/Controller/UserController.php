@@ -38,5 +38,17 @@ class UserController extends BaseController
             'id' => $user->getIdUser() 
         ]);
     }
+    
+    public function getVotes($id, Application $app) {
+        $user = UserQuery::create()->findOneByIdUser($id);
+        
+        $dto = [
+            'vote1' => $user->getVote1(),
+            'vote2' => $user->getVote2(),
+            'vote3' => $user->getVote3()
+        ];
+        
+        return $this->json($dto);
+    }
 
 }

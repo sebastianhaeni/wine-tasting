@@ -36,9 +36,11 @@ class Router
         
         // User
         $app->post('/v1/user/register', 'WineTasting\\Controller\\UserController::register');
+        $app->get('/v1/user/{id}/votes', 'WineTasting\\Controller\\UserController::getVotes');
         
         // Wine
         $app->get('/v1/wine', 'WineTasting\\Controller\\WineController::getWines');
+        $app->get('/v1/wine/ranking', 'WineTasting\\Controller\\WineController::getRankedWines');
         $app->get('/v1/wine/{id}', 'WineTasting\\Controller\\WineController::getWine');
         $app->post('/v1/wine', 'WineTasting\\Controller\\WineController::create');
         $app->post('/v1/wine/vote1', 'WineTasting\\Controller\\WineController::vote1');

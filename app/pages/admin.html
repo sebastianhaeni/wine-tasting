@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <form action="http://localhost:3001/v1/wine" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="year">Jahr</label>
+            <input type="number" class="form-control" id="year" placeholder="Jahr" min="1900" max="2020" name="year" required>
+        </div>
+        <div class="form-group">
+            <label for="username">Person wo dä Wii mitbracht het</label>
+            <input type="text" class="form-control" id="username" placeholder="Name" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="picture">Biud</label>
+            <input type="file" name="picture" required accept="image/*">
+        </div>
+
+        <input type="submit" value="Spichere" class="btn btn-primary">
+    </form>
+{% endblock %}
