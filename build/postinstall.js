@@ -7,11 +7,11 @@ var fs = require('fs');
 var path = require('path');
 var childProcess = require('child_process');
 
-var apiSrc  = path.join(__dirname, '../../config/sample/api.yml');
-var apiDist = path.join(__dirname, '../../config/api.yml');
+var apiSrc  = path.join(__dirname, '../config/sample/api.yml');
+var apiDist = path.join(__dirname, '../config/api.yml');
 
-var propelSrc  = path.join(__dirname, '../../config/sample/propel.yml');
-var propelDist = path.join(__dirname, '../../config/propel.yml');
+var propelSrc  = path.join(__dirname, '../config/sample/propel.yml');
+var propelDist = path.join(__dirname, '../config/propel.yml');
 
 // copy api.yml from samples
 if(!fs.existsSync(apiDist)){
