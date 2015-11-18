@@ -1,5 +1,5 @@
-const API = '/api/v1/';
-const IMG = '/upload/';
+var API = '/api/v1/';
+var IMG = '/upload/';
 
 if($('#welcome-page').length === 1 && localStorage.getItem('idUser') !== null){
     window.location = 'voting.html';
@@ -51,16 +51,23 @@ if($('#results').length === 1){
         success: function(response){
             $.each(response, function(i, wine){
                 addResultWine(wine);
+                addResultWine(wine);
+                addResultWine(wine);
+                addResultWine(wine);
             });
         }
-    })
+    });
+
+    setTimeout(function() {
+        location.reload();
+    }, 30000);
 }
 
 $(document).on('click', '.vote', function(){
-    let addVote = !$(this).hasClass('active');
+    var addVote = !$(this).hasClass('active');
     $(this).toggleClass('active btn-primary');
-    let weight = parseInt($(this).attr('data-weight'));
-    let idWine = $(this).parents('.wine').attr('data-id');
+    var weight = parseInt($(this).attr('data-weight'));
+    var idWine = $(this).parents('.wine').attr('data-id');
     $('.vote[data-weight=' + weight + '].active').not(this).each(function(i, vote){
         $(vote).removeClass('active btn-primary');
         changePoints($(vote).parents('.wine').attr('data-id'), -weight);
@@ -79,9 +86,9 @@ $(document).on('click', '.vote', function(){
 });
 
 function changePoints(idWine, delta){
-    let pointSpan = $('.wine[data-id=' + idWine + '] .points');
-    let currentPoints = parseInt(pointSpan.text());
-    let points = currentPoints + delta;
+    var pointSpan = $('.wine[data-id=' + idWine + '] .points');
+    var currentPoints = parseInt(pointSpan.text());
+    var points = currentPoints + delta;
     pointSpan.text(points);
 }
 
@@ -108,7 +115,7 @@ function addWine(wine){
 
 function addResultWine(wine){
     $('#results').append(
-        '<div class="panel panel-default wine">' +
+        '<div class="panel panel-default wine wine-result">' +
             '<div class="panel-heading">' +
                 '<h4>#' + wine.id + ' - ' + wine.name + ' - ' + wine.year + ' ' +
                 '</h4>' +

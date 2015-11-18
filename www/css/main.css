@@ -12,3 +12,20 @@ img {
 .fix-pos {
   margin-top: -6px;
   margin-right: -12px; }
+
+#results {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; }
+
+.wine-result {
+  align-items: stretch;
+  position: relative;
+  padding-bottom: 50px;
+  min-width: 325px;
+  max-width: 325px;
+  margin: 20px; }
+  .wine-result .panel-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%; }
