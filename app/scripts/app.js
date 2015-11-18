@@ -39,6 +39,10 @@ if($('#wine-list').length === 1){
                     if(response.vote3 !== null){
                         $('.wine[data-id=' + response.vote3 + '] .btn[data-weight=3]').addClass('active btn-primary');
                     }
+                },
+                error: function(){
+                    localStorage.removeItem('idUser');
+                    window.location = '/';
                 }
             })
         }
@@ -50,9 +54,6 @@ if($('#results').length === 1){
         url: API + 'wine/ranking',
         success: function(response){
             $.each(response, function(i, wine){
-                addResultWine(wine);
-                addResultWine(wine);
-                addResultWine(wine);
                 addResultWine(wine);
             });
         }
@@ -71,6 +72,21 @@ $(document).on('click', '.vote', function(){
     $('.vote[data-weight=' + weight + '].active').not(this).each(function(i, vote){
         $(vote).removeClass('active btn-primary');
         changePoints($(vote).parents('.wine').attr('data-id'), -weight);
+    });
+
+    $('.wine[data-id=' + idWine + '] .active').not(this).each(function(i, vote){
+        $(vote).removeClass('active btn-primary');
+        var thisWeight = parseInt($(this).attr('data-weight'));
+        changePoints($(vote).parents('.wine').attr('data-id'), -thisWeight);
+
+        $.ajax({
+            url: API + 'wine/vote' + thisWeight,
+            method: 'POST',
+            data: {
+                idUser: localStorage.getItem('idUser'),
+                idWine: null
+            }
+        });
     });
 
     changePoints(idWine, addVote ? weight : -weight)

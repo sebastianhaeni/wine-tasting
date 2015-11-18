@@ -27,8 +27,6 @@ class WineController extends BaseController
             $dtos [] = $this->createWineDto($wine);
         }
         
-        usort($dtos, "WineController::compareWine");
-        
         return $this->json($dtos);
     }
 
@@ -37,7 +35,7 @@ class WineController extends BaseController
         if ($a ['points'] == $b ['points']) {
             return 0;
         }
-        return ($a ['points'] < $b ['points']) ? - 1 : 1;
+        return ($a ['points'] > $b ['points']) ? - 1 : 1;
     }
 
     public function getRankedWines(Request $request, Application $app)
@@ -48,6 +46,11 @@ class WineController extends BaseController
         foreach ($wines as $wine) {
             $dtos [] = $this->createWineDto($wine);
         }
+        
+        usort($dtos, [ 
+            $this,
+            'compareWine' 
+        ]);
         
         return $this->json($dtos);
     }

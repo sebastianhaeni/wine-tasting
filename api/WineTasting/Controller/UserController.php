@@ -6,6 +6,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use WineTasting\Model\User;
 use WineTasting\Model\UserQuery;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Registers users.
@@ -41,6 +42,10 @@ class UserController extends BaseController
     
     public function getVotes($id, Application $app) {
         $user = UserQuery::create()->findOneByIdUser($id);
+        
+        if($user === null){
+            return new Response('Error', 404);
+        }
         
         $dto = [
             'vote1' => $user->getVote1(),
