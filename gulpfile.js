@@ -1,10 +1,11 @@
+var babel = require('babelify');
+var browserify = require('browserify');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
 var sass = require('gulp-sass');
 var nunjucksRender = require('gulp-nunjucks-render');
 var gls = require('gulp-live-server');
-var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var del = require('del');
@@ -35,26 +36,24 @@ gulp.task('nunjucks', function() {
 });
 
 gulp.task('js', function() {
-    var b = browserify({
-        entries: 'app/scripts/app.js',
-        debug: true,
-        transform: ['strictify', 'babelify']
-    });
+    var bundler = browserify('app/scripts/app.js').transform(babel, {presets: ['es2015']});
 
-    return b.bundle()
-        .on('error', function (err) {
-            console.log(err.toString());
-            this.emit("end");
+    bundler.bundle()
+        .on('error', function(err) { 
+        	console.error(err); 
+        	this.emit('end'); 
         })
         .pipe(source('app.js'))
         .pipe(buffer())
         .pipe(gulp.dest('www/js'));
+
+    return;
 });
 
 gulp.task('images', function() {
     gulp.src('app/images/**/*.{png,jpg,gif}')
         .pipe(gulp.dest('www/images'));
-})
+});
 
 gulp.task('server', ['default'], function() {
     var server = gls.new('./build/server.js');

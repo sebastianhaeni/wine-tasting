@@ -1,5 +1,5 @@
-var API = '/api/v1/';
-var IMG = '/upload/';
+const API = '/api/v1/';
+const IMG = '/upload/';
 
 if($('#welcome-page').length === 1 && localStorage.getItem('idUser') !== null){
     window.location = 'voting.html';
@@ -7,7 +7,7 @@ if($('#welcome-page').length === 1 && localStorage.getItem('idUser') !== null){
 }
 
 $('#user-form').submit(function() {
-    var idUser = guid();
+    let idUser = guid();
     $.ajax({
         url: API + 'user/register',
         method: 'POST',
@@ -30,7 +30,7 @@ if($('#show-usernames').length === 1){
 }
 
 $('#show-usernames').change(function(){
-    var show = $(this).prop('checked');
+    let show = $(this).prop('checked');
     $.ajax({
         url: API + 'config/show-usernames',
         method: 'post',
@@ -74,7 +74,7 @@ if($('#results').length === 1){
     $.ajax({
         url: API + 'config/show-usernames',
         success: function(response){
-            var showUsername = response === 'true';
+            let showUsername = response === 'true';
             $.ajax({
                 url: API + 'wine/ranking',
                 success: function(response){
@@ -94,7 +94,7 @@ function updateResults(){
     $.ajax({
         url: API + 'wine/ranking',
         success: function(response){
-            var lastWine = null;
+            let lastWine = null;
             $.each(response, function(i, wine){
                 $('.wine[data-id=' + wine.id + ']').attr('data-points', wine.points);
                 $('.wine[data-id=' + wine.id + '] .points').text(wine.points);
@@ -108,12 +108,12 @@ function updateResults(){
     setTimeout(updateResults, 2000);
 }
 
-var stylesToSnapshot = ["transform", "-webkit-transform"];
+const stylesToSnapshot = ["transform", "-webkit-transform"];
 
 $.fn.snapshotStyles = function () {
     if (window.getComputedStyle) {
         $(this).each(function () {
-            for (var i = 0; i < stylesToSnapshot.length; i++)
+            for (let i = 0; i < stylesToSnapshot.length; i++)
                 this.style[stylesToSnapshot[i]] = getComputedStyle(this)[stylesToSnapshot[i]];
         });
     }
@@ -123,22 +123,22 @@ $.fn.snapshotStyles = function () {
 $.fn.releaseSnapshot = function () {
     $(this).each(function () {
         this.offsetHeight; // Force position to be recomputed before transition starts
-        for (var i = 0; i < stylesToSnapshot.length; i++)
+        for (let i = 0; i < stylesToSnapshot.length; i++)
             this.style[stylesToSnapshot[i]] = "";
     });
 };
 
 function createListStyles(rulePattern, rows, cols) {
-    var rules = [], index = 0;
-    for (var rowIndex = 0; rowIndex < rows; rowIndex++) {
-        for (var colIndex = 0; colIndex < cols; colIndex++) {
-            var x = (10+(colIndex * 110)) + "%",
+    let rules = [], index = 0;
+    for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
+        for (let colIndex = 0; colIndex < cols; colIndex++) {
+            let x = (10+(colIndex * 110)) + "%",
                 y = (10+(rowIndex * 110)) + "%",
                 transforms = "{ -webkit-transform: translate3d(" + x + ", " + y + ", 0); transform: translate3d(" + x + ", " + y + ", 0); }";
             rules.push(rulePattern.replace("{0}", ++index) + transforms);
         }
     }
-    var headElem = document.getElementsByTagName("head")[0],
+    let headElem = document.getElementsByTagName("head")[0],
         styleElem = $("<style>").attr("type", "text/css").appendTo(headElem)[0];
     if (styleElem.styleSheet) {
         styleElem.styleSheet.cssText = rules.join("\n");
@@ -150,10 +150,10 @@ function createListStyles(rulePattern, rows, cols) {
 createListStyles(".wine-result:nth-child({0})", 50, $(window).width() / 420);
 
 $(document).on('click', '.vote', function(){
-    var addVote = !$(this).hasClass('active');
+    let addVote = !$(this).hasClass('active');
     $(this).toggleClass('active btn-primary');
-    var weight = parseInt($(this).attr('data-weight'));
-    var idWine = $(this).parents('.wine').attr('data-id');
+    let weight = parseInt($(this).attr('data-weight'));
+    let idWine = $(this).parents('.wine').attr('data-id');
     $('.vote[data-weight=' + weight + '].active').not(this).each(function(i, vote){
         $(vote).removeClass('active btn-primary');
         changePoints($(vote).parents('.wine').attr('data-id'), -weight);
@@ -161,7 +161,7 @@ $(document).on('click', '.vote', function(){
 
     $('.wine[data-id=' + idWine + '] .active').not(this).each(function(i, vote){
         $(vote).removeClass('active btn-primary');
-        var thisWeight = parseInt($(this).attr('data-weight'));
+        let thisWeight = parseInt($(this).attr('data-weight'));
         changePoints($(vote).parents('.wine').attr('data-id'), -thisWeight);
 
         $.ajax({
@@ -187,9 +187,9 @@ $(document).on('click', '.vote', function(){
 });
 
 function changePoints(idWine, delta){
-    var pointSpan = $('.wine[data-id=' + idWine + '] .points');
-    var currentPoints = parseInt(pointSpan.text());
-    var points = currentPoints + delta;
+    let pointSpan = $('.wine[data-id=' + idWine + '] .points');
+    let currentPoints = parseInt(pointSpan.text());
+    let points = currentPoints + delta;
     pointSpan.text(points);
 }
 
