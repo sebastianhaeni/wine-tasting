@@ -34,7 +34,7 @@ function updateResults(){
         }
     });
 
-    setTimeout(updateResults, 2000);
+    setTimeout(updateResults, 180000); // 3 minutes
 }
 
 const stylesToSnapshot = ["transform", "-webkit-transform"];
