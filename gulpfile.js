@@ -57,7 +57,7 @@ gulp.task('images', function() {
 })
 
 gulp.task('server', ['default'], function() {
-    var server = gls.static('www', 3000);
+    var server = gls.new('./build/server.js');
     server.start();
 
     // Restart the server when file changes

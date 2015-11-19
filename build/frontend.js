@@ -4,8 +4,13 @@
 const childProcess = require('child_process');
 
 console.log("Running app at http://localhost:3000");
-childProcess.execFileSync('gulp', []);
+var child = childProcess.execFile('.\\node_modules\\.bin\\gulp.cmd', ['server'], function(error, stdout, stderr) {
+    console.log(stdout);
+});
+child.stdout.on('data', function(data) {
+    console.log(data);
+});
 
 if(process.env.npm_config_argv.indexOf('--open') >= 0){
-  require('open')('http://localhost:3000');
+    require('open')('http://localhost:3000');
 }
