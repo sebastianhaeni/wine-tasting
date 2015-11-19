@@ -12,6 +12,4 @@ config/api.yml
 config/propel.yml
 api/wine-tasting.db
 
-upload/*
 www/
-!.gitkeep
