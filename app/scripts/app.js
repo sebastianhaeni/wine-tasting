@@ -7,16 +7,38 @@ if($('#welcome-page').length === 1 && localStorage.getItem('idUser') !== null){
 }
 
 $('#user-form').submit(function() {
+    var idUser = guid();
     $.ajax({
         url: API + 'user/register',
         method: 'POST',
-        data: {'name': $('#user-name').val()},
+        data: {'name': idUser},
         success: function(response){
             localStorage.setItem('idUser', response.id);
             window.location = 'rules.html';
         }
     });
     return false;
+});
+
+if($('#show-usernames').length === 1){
+    $.ajax({
+        url: API + 'config/show-usernames',
+        success: function(response){
+            console.log(response);
+            $('#show-usernames').prop('checked', response === 'true');
+        }
+    });
+}
+
+$('#show-usernames').change(function(){
+    var show = $(this).prop('checked');
+    $.ajax({
+        url: API + 'config/show-usernames',
+        method: 'post',
+        data: {
+            value: show
+        }
+    });
 });
 
 if($('#wine-list').length === 1){
@@ -51,10 +73,16 @@ if($('#wine-list').length === 1){
 
 if($('#results').length === 1){
     $.ajax({
-        url: API + 'wine/ranking',
+        url: API + 'config/show-usernames',
         success: function(response){
-            $.each(response, function(i, wine){
-                addResultWine(wine);
+            var showUsername = response === 'true';
+            $.ajax({
+                url: API + 'wine/ranking',
+                success: function(response){
+                    $.each(response, function(i, wine){
+                        addResultWine(wine, showUsername);
+                    });
+                }
             });
         }
     });
@@ -129,7 +157,7 @@ function addWine(wine){
         '</div>');
 }
 
-function addResultWine(wine){
+function addResultWine(wine, showUsername){
     $('#results').append(
         '<div class="panel panel-default wine wine-result">' +
             '<div class="panel-heading">' +
@@ -141,6 +169,17 @@ function addResultWine(wine){
             '</div>' +
             '<div class="panel-footer">' +
                 '<span class="points">' + wine.points + '</span> <span class="glyphicon glyphicon-heart"></span>' +
+                (showUsername ? '<span class="pull-right">' + wine.submitter + '</span>' : '') +
             '</div>' +
         '</div>');
+}
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
 }

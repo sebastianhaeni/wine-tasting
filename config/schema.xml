@@ -85,4 +85,14 @@
     </foreign-key>
   </table>
 
+  <table name="config" idMethod="native" phpName="Config">
+      <column name="idConfig" phpName="IdConfig" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+      <column name="name" phpName="Name" type="VARCHAR" size="200" required="true"/>
+      <column name="value" phpName="Value" type="VARCHAR" size="200" required="false"/>
+
+      <unique>
+        <unique-column name="name"/>
+      </unique>
+  </table>
+
 </database>

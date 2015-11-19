@@ -46,6 +46,10 @@ class Router
         $app->post('/v1/wine/vote1', 'WineTasting\\Controller\\WineController::vote1');
         $app->post('/v1/wine/vote2', 'WineTasting\\Controller\\WineController::vote2');
         $app->post('/v1/wine/vote3', 'WineTasting\\Controller\\WineController::vote3');
+        
+        // Config
+        $app->post('/v1/config/{name}', 'WineTasting\\Controller\\ConfigController::setValue');
+        $app->get('/v1/config/{name}', 'WineTasting\\Controller\\ConfigController::getValue');
     }
 
 }
