@@ -24,7 +24,6 @@ if($('#show-usernames').length === 1){
     $.ajax({
         url: API + 'config/show-usernames',
         success: function(response){
-            console.log(response);
             $('#show-usernames').prop('checked', response === 'true');
         }
     });
@@ -87,10 +86,68 @@ if($('#results').length === 1){
         }
     });
 
-    setTimeout(function() {
-        location.reload();
-    }, 30000);
+    setTimeout(updateResults, 4000);
 }
+
+function updateResults(){
+
+    $.ajax({
+        url: API + 'wine/ranking',
+        success: function(response){
+            var lastWine = null;
+            $.each(response, function(i, wine){
+                $('.wine[data-id=' + wine.id + ']').attr('data-points', wine.points);
+                $('.wine[data-id=' + wine.id + '] .points').text(wine.points);
+            });
+            $('.wine').snapshotStyles();
+            tinysort('.wine', {attr: 'data-points', order: 'desc'});
+            $('.wine').releaseSnapshot();
+        }
+    });
+
+    setTimeout(updateResults, 2000);
+}
+
+var stylesToSnapshot = ["transform", "-webkit-transform"];
+
+$.fn.snapshotStyles = function () {
+    if (window.getComputedStyle) {
+        $(this).each(function () {
+            for (var i = 0; i < stylesToSnapshot.length; i++)
+                this.style[stylesToSnapshot[i]] = getComputedStyle(this)[stylesToSnapshot[i]];
+        });
+    }
+    return this;
+};
+
+$.fn.releaseSnapshot = function () {
+    $(this).each(function () {
+        this.offsetHeight; // Force position to be recomputed before transition starts
+        for (var i = 0; i < stylesToSnapshot.length; i++)
+            this.style[stylesToSnapshot[i]] = "";
+    });
+};
+
+function createListStyles(rulePattern, rows, cols) {
+    var rules = [], index = 0;
+    for (var rowIndex = 0; rowIndex < rows; rowIndex++) {
+        for (var colIndex = 0; colIndex < cols; colIndex++) {
+            var x = (10+(colIndex * 110)) + "%",
+                y = (10+(rowIndex * 110)) + "%",
+                transforms = "{ -webkit-transform: translate3d(" + x + ", " + y + ", 0); transform: translate3d(" + x + ", " + y + ", 0); }";
+            rules.push(rulePattern.replace("{0}", ++index) + transforms);
+        }
+    }
+    var headElem = document.getElementsByTagName("head")[0],
+        styleElem = $("<style>").attr("type", "text/css").appendTo(headElem)[0];
+    if (styleElem.styleSheet) {
+        styleElem.styleSheet.cssText = rules.join("\n");
+    } else {
+        styleElem.textContent = rules.join("\n");
+    }
+}
+
+createListStyles(".wine-result:nth-child({0})", 50, $(window).width() / 420);
 
 $(document).on('click', '.vote', function(){
     var addVote = !$(this).hasClass('active');
@@ -159,7 +216,7 @@ function addWine(wine){
 
 function addResultWine(wine, showUsername){
     $('#results').append(
-        '<div class="panel panel-default wine wine-result">' +
+        '<div class="panel panel-default wine wine-result" data-id="' + wine.id + '">' +
             '<div class="panel-heading">' +
                 '<h4>#' + wine.id + ' - ' + wine.name + ' - ' + wine.year + ' ' +
                 '</h4>' +

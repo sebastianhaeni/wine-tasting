@@ -21,18 +21,18 @@ img {
 }
 
 #results {
-    display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
 
 .wine-result {
     align-items: stretch;
-    position: relative;
-    padding-bottom: 50px;
+    position: absolute;
     min-width: 325px;
     max-width: 325px;
-    margin: 20px;
+    left: 0;
+    transition: all 1s ease;
+    padding-bottom: 60px;
 
     .panel-footer {
         position: absolute;
