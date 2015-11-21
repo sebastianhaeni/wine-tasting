@@ -1,4 +1,8 @@
 
+body {
+    background-color: #445863;
+}
+
 img {
     max-width: 100%;
     max-height: 400px;
@@ -13,6 +17,12 @@ img {
 .welcome {
     font-size: 25px;
     margin: 10px;
+
+    color: #fff;
+
+    .panel {
+        color: #000;
+    }
 }
 
 .fix-pos {

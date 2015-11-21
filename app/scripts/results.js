@@ -1,10 +1,11 @@
 const config = require('./config');
+var showUsername = false;
 
 if($('#results').length === 1){
     $.ajax({
         url: config.API + 'config/show-usernames',
         success: function(response){
-            let showUsername = response === 'true';
+            showUsername = response === 'true';
             $.ajax({
                 url: config.API + 'wine/ranking',
                 success: function(response){
@@ -16,6 +17,8 @@ if($('#results').length === 1){
         }
     });
 
+    createListStyles(".wine-result:nth-child({0})", 50, $(window).width() / 420);
+
     setTimeout(updateResults, 4000);
 }
 
@@ -25,6 +28,9 @@ function updateResults(){
         success: function(response){
             let lastWine = null;
             $.each(response, function(i, wine){
+                if($('.wine[data-id=' + wine.id + ']').length !== 1){
+                    addResultWine(wine, showUsername);
+                }
                 $('.wine[data-id=' + wine.id + ']').attr('data-points', wine.points);
                 $('.wine[data-id=' + wine.id + '] .points').text(wine.points);
             });
@@ -34,7 +40,8 @@ function updateResults(){
         }
     });
 
-    setTimeout(updateResults, 180000); // 3 minutes
+    //setTimeout(updateResults, 180000); // 3 minutes
+    setTimeout(updateResults, 5000); // 3 minutes
 }
 
 const stylesToSnapshot = ["transform", "-webkit-transform"];
@@ -75,8 +82,6 @@ function createListStyles(rulePattern, rows, cols) {
         styleElem.textContent = rules.join("\n");
     }
 }
-
-createListStyles(".wine-result:nth-child({0})", 50, $(window).width() / 420);
 
 function addResultWine(wine, showUsername){
     let id = showUsername ? '#' + wine.id + ' - ' : '';
