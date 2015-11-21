@@ -20,6 +20,7 @@ $('#user-form').submit(function() {
     $.ajax({
         url: config.API + 'user/register',
         method: 'POST',
+        headers: { "cache-control": "no-cache" },
         data: {'name': idUser},
         success: function(response){
             localStorage.setItem('idUser', response.id);

@@ -3,10 +3,12 @@ const config = require('./config');
 if($('#wine-list').length === 1){
     $.ajax({
         url: config.API + 'config/show-usernames',
+        headers: { "cache-control": "no-cache" },
         success: function(response){
             let showUsername = response === 'true';
             $.ajax({
                 url: config.API + 'wine',
+                headers: { "cache-control": "no-cache" },
                 success: function(response){
                     $.each(response, function(i, wine) {
                         addWine(wine, showUsername);
@@ -78,6 +80,7 @@ $(document).on('click', '.vote', function(){
         $.ajax({
             url: config.API + 'wine/vote' + thisWeight,
             method: 'POST',
+            headers: { "cache-control": "no-cache" },
             data: {
                 idUser: localStorage.getItem('idUser'),
                 idWine: null
@@ -90,6 +93,7 @@ $(document).on('click', '.vote', function(){
     $.ajax({
         url: config.API + 'wine/vote' + weight,
         method: 'POST',
+        headers: { "cache-control": "no-cache" },
         data: {
             idUser: localStorage.getItem('idUser'),
             idWine: addVote ? idWine : null
