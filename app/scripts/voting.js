@@ -96,3 +96,10 @@ $(document).on('click', '.vote', function(){
         }
     });
 });
+
+function changePoints(idWine, delta){
+    let pointSpan = $('.wine[data-id=' + idWine + '] .points');
+    let currentPoints = parseInt(pointSpan.text());
+    let points = currentPoints + delta;
+    pointSpan.text(points);
+}
