@@ -9,10 +9,25 @@ img {
 }
 
 .wine {
+    .panel-heading {
+        overflow: hidden;
+    }
+
     .panel-body {
         text-align: center;
     }
-}
+
+    h4 {
+        float: left;
+    }
+
+    .tasted {
+        float: right;
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        margin: 7px 0;
+    }}
 
 .welcome {
     font-size: 25px;
