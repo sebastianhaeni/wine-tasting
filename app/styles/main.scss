@@ -1,42 +1,64 @@
 
+body {
+  background-color: #445863;
+}
+
 img {
-    max-width: 100%;
-    max-height: 400px;
+  max-width: 100%;
+  max-height: 400px;
 }
 
 .wine {
-    .panel-body {
-        text-align: center;
-    }
+
+  .panel-heading {
+    overflow: hidden;
+  }
+
+  .panel-body {
+    text-align: center;
+  }
+
+  h4 {
+    float: left;
+  }
+
+  .tasted {
+    float: right;
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    margin: 7px 0;
+  }
 }
 
 .welcome {
-    font-size: 25px;
-    margin: 10px;
+  font-size: 25px;
+  margin: 10px;
+  color: #fff;
 }
 
 .fix-pos {
-    margin-top: -6px;
-    margin-right: -12px;
+  margin-top: -6px;
+  margin-right: -12px;
 }
 
 #results {
-    flex-wrap: wrap;
-    justify-content: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .wine-result {
-    align-items: stretch;
-    position: absolute;
-    min-width: 325px;
-    max-width: 325px;
-    left: 0;
-    transition: all 1s ease;
-    padding-bottom: 60px;
+  align-items: stretch;
+  position: absolute;
+  min-width: 325px;
+  max-width: 325px;
+  left: 0;
+  transition: all 1s ease;
+  padding-bottom: 60px;
 
-    .panel-footer {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-    }
+  .panel-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
 }

@@ -1,6 +1,9 @@
 .settings/
+.idea/
 .project
 .buildpath
+
+*.iml
 
 build/generated
 vendor/

@@ -186,6 +186,14 @@ class UserTableMap extends TableMap
     1 => ':idUser',
   ),
 ), 'CASCADE', 'CASCADE', 'WinesRelatedBySubmitter', false);
+        $this->addRelation('TastedWine', '\\WineTasting\\Model\\TastedWine', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':idUser',
+    1 => ':idUser',
+  ),
+), 'CASCADE', 'CASCADE', 'TastedWines', false);
+        $this->addRelation('Wine', '\\WineTasting\\Model\\Wine', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Wines');
     } // buildRelations()
     /**
      * Method to invalidate the instance pool of all tables related to user     * by a foreign key with ON DELETE CASCADE
@@ -195,6 +203,7 @@ class UserTableMap extends TableMap
         // Invalidate objects in related instance pools,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         WineTableMap::clearInstancePool();
+        TastedWineTableMap::clearInstancePool();
     }
 
     /**

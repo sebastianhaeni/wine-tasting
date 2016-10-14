@@ -13,10 +13,9 @@ class HomeController extends BaseController
 {
 
     /**
-     * Standard 'It works' response.
-     *
      * @param Request $request
      * @param Application $app
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function info(Request $request, Application $app)
     {

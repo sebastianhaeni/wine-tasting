@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use WineTasting\Model\Wine;
-use WineTasting\Model\WineQuery;
+use WineTasting\Model\TastedWine;
+use WineTasting\Model\TastedWineQuery;
 
 
 /**
- * This class defines the structure of the 'wine' table.
+ * This class defines the structure of the 'tasted_wine' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use WineTasting\Model\WineQuery;
  * (i.e. if it's a text column type).
  *
  */
-class WineTableMap extends TableMap
+class TastedWineTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class WineTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'WineTasting.Model.Map.WineTableMap';
+    const CLASS_NAME = 'WineTasting.Model.Map.TastedWineTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class WineTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'wine';
+    const TABLE_NAME = 'tasted_wine';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\WineTasting\\Model\\Wine';
+    const OM_CLASS = '\\WineTasting\\Model\\TastedWine';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'WineTasting.Model.Wine';
+    const CLASS_DEFAULT = 'WineTasting.Model.TastedWine';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -69,32 +69,17 @@ class WineTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 2;
+
+    /**
+     * the column name for the idUser field
+     */
+    const COL_IDUSER = 'tasted_wine.idUser';
 
     /**
      * the column name for the idWine field
      */
-    const COL_IDWINE = 'wine.idWine';
-
-    /**
-     * the column name for the name field
-     */
-    const COL_NAME = 'wine.name';
-
-    /**
-     * the column name for the picture field
-     */
-    const COL_PICTURE = 'wine.picture';
-
-    /**
-     * the column name for the year field
-     */
-    const COL_YEAR = 'wine.year';
-
-    /**
-     * the column name for the idSubmitter field
-     */
-    const COL_IDSUBMITTER = 'wine.idSubmitter';
+    const COL_IDWINE = 'tasted_wine.idWine';
 
     /**
      * The default string format for model objects of the related table
@@ -108,11 +93,11 @@ class WineTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('IdWine', 'Name', 'Picture', 'Year', 'Submitter', ),
-        self::TYPE_CAMELNAME     => array('idWine', 'name', 'picture', 'year', 'submitter', ),
-        self::TYPE_COLNAME       => array(WineTableMap::COL_IDWINE, WineTableMap::COL_NAME, WineTableMap::COL_PICTURE, WineTableMap::COL_YEAR, WineTableMap::COL_IDSUBMITTER, ),
-        self::TYPE_FIELDNAME     => array('idWine', 'name', 'picture', 'year', 'idSubmitter', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('IdUser', 'IdWine', ),
+        self::TYPE_CAMELNAME     => array('idUser', 'idWine', ),
+        self::TYPE_COLNAME       => array(TastedWineTableMap::COL_IDUSER, TastedWineTableMap::COL_IDWINE, ),
+        self::TYPE_FIELDNAME     => array('idUser', 'idWine', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -122,11 +107,11 @@ class WineTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('IdWine' => 0, 'Name' => 1, 'Picture' => 2, 'Year' => 3, 'Submitter' => 4, ),
-        self::TYPE_CAMELNAME     => array('idWine' => 0, 'name' => 1, 'picture' => 2, 'year' => 3, 'submitter' => 4, ),
-        self::TYPE_COLNAME       => array(WineTableMap::COL_IDWINE => 0, WineTableMap::COL_NAME => 1, WineTableMap::COL_PICTURE => 2, WineTableMap::COL_YEAR => 3, WineTableMap::COL_IDSUBMITTER => 4, ),
-        self::TYPE_FIELDNAME     => array('idWine' => 0, 'name' => 1, 'picture' => 2, 'year' => 3, 'idSubmitter' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('IdUser' => 0, 'IdWine' => 1, ),
+        self::TYPE_CAMELNAME     => array('idUser' => 0, 'idWine' => 1, ),
+        self::TYPE_COLNAME       => array(TastedWineTableMap::COL_IDUSER => 0, TastedWineTableMap::COL_IDWINE => 1, ),
+        self::TYPE_FIELDNAME     => array('idUser' => 0, 'idWine' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -139,18 +124,16 @@ class WineTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('wine');
-        $this->setPhpName('Wine');
+        $this->setName('tasted_wine');
+        $this->setPhpName('TastedWine');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\WineTasting\\Model\\Wine');
+        $this->setClassName('\\WineTasting\\Model\\TastedWine');
         $this->setPackage('WineTasting.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
-        $this->addPrimaryKey('idWine', 'IdWine', 'INTEGER', true, null, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', true, 200, null);
-        $this->addColumn('picture', 'Picture', 'VARCHAR', true, 200, null);
-        $this->addColumn('year', 'Year', 'SMALLINT', true, null, null);
-        $this->addForeignKey('idSubmitter', 'Submitter', 'INTEGER', 'user', 'idUser', true, null, null);
+        $this->addForeignPrimaryKey('idUser', 'IdUser', 'INTEGER' , 'user', 'idUser', true, null, null);
+        $this->addForeignPrimaryKey('idWine', 'IdWine', 'INTEGER' , 'wine', 'idWine', true, null, null);
     } // initialize()
 
     /**
@@ -158,52 +141,73 @@ class WineTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('UserRelatedBySubmitter', '\\WineTasting\\Model\\User', RelationMap::MANY_TO_ONE, array (
+        $this->addRelation('User', '\\WineTasting\\Model\\User', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':idSubmitter',
+    0 => ':idUser',
     1 => ':idUser',
   ),
 ), 'CASCADE', 'CASCADE', null, false);
-        $this->addRelation('UserRelatedByVote1', '\\WineTasting\\Model\\User', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':vote1',
-    1 => ':idWine',
-  ),
-), 'SET NULL', 'SET NULL', 'UsersRelatedByVote1', false);
-        $this->addRelation('UserRelatedByVote2', '\\WineTasting\\Model\\User', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':vote2',
-    1 => ':idWine',
-  ),
-), 'SET NULL', 'SET NULL', 'UsersRelatedByVote2', false);
-        $this->addRelation('UserRelatedByVote3', '\\WineTasting\\Model\\User', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':vote3',
-    1 => ':idWine',
-  ),
-), 'SET NULL', 'SET NULL', 'UsersRelatedByVote3', false);
-        $this->addRelation('TastedWine', '\\WineTasting\\Model\\TastedWine', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Wine', '\\WineTasting\\Model\\Wine', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':idWine',
     1 => ':idWine',
   ),
-), 'CASCADE', 'CASCADE', 'TastedWines', false);
-        $this->addRelation('User', '\\WineTasting\\Model\\User', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Users');
+), 'CASCADE', 'CASCADE', null, false);
     } // buildRelations()
+
     /**
-     * Method to invalidate the instance pool of all tables related to wine     * by a foreign key with ON DELETE CASCADE
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \WineTasting\Model\TastedWine $obj A \WineTasting\Model\TastedWine object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
-    public static function clearRelatedInstancePool()
+    public static function addInstanceToPool($obj, $key = null)
     {
-        // Invalidate objects in related instance pools,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        UserTableMap::clearInstancePool();
-        TastedWineTableMap::clearInstancePool();
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getIdUser(), (string) $obj->getIdWine()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \WineTasting\Model\TastedWine object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \WineTasting\Model\TastedWine) {
+                $key = serialize(array((string) $value->getIdUser(), (string) $value->getIdWine()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \WineTasting\Model\TastedWine object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
     }
 
     /**
@@ -222,11 +226,11 @@ class WineTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('IdWine', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('IdUser', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('IdWine', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('IdWine', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('IdUser', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('IdWine', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -243,11 +247,20 @@ class WineTableMap extends TableMap
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return (int) $row[
+            $pks = [];
+
+        $pks[] = (int) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
+                : self::translateFieldName('IdUser', TableMap::TYPE_PHPNAME, $indexType)
+        ];
+        $pks[] = (int) $row[
+            $indexType == TableMap::TYPE_NUM
+                ? 1 + $offset
                 : self::translateFieldName('IdWine', TableMap::TYPE_PHPNAME, $indexType)
         ];
+
+        return $pks;
     }
 
     /**
@@ -263,7 +276,7 @@ class WineTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? WineTableMap::CLASS_DEFAULT : WineTableMap::OM_CLASS;
+        return $withPrefix ? TastedWineTableMap::CLASS_DEFAULT : TastedWineTableMap::OM_CLASS;
     }
 
     /**
@@ -277,22 +290,22 @@ class WineTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Wine object, last column rank)
+     * @return array           (TastedWine object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = WineTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = WineTableMap::getInstanceFromPool($key))) {
+        $key = TastedWineTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = TastedWineTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + WineTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + TastedWineTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = WineTableMap::OM_CLASS;
-            /** @var Wine $obj */
+            $cls = TastedWineTableMap::OM_CLASS;
+            /** @var TastedWine $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            WineTableMap::addInstanceToPool($obj, $key);
+            TastedWineTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -315,18 +328,18 @@ class WineTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = WineTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = WineTableMap::getInstanceFromPool($key))) {
+            $key = TastedWineTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = TastedWineTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Wine $obj */
+                /** @var TastedWine $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                WineTableMap::addInstanceToPool($obj, $key);
+                TastedWineTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -347,17 +360,11 @@ class WineTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(WineTableMap::COL_IDWINE);
-            $criteria->addSelectColumn(WineTableMap::COL_NAME);
-            $criteria->addSelectColumn(WineTableMap::COL_PICTURE);
-            $criteria->addSelectColumn(WineTableMap::COL_YEAR);
-            $criteria->addSelectColumn(WineTableMap::COL_IDSUBMITTER);
+            $criteria->addSelectColumn(TastedWineTableMap::COL_IDUSER);
+            $criteria->addSelectColumn(TastedWineTableMap::COL_IDWINE);
         } else {
+            $criteria->addSelectColumn($alias . '.idUser');
             $criteria->addSelectColumn($alias . '.idWine');
-            $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.picture');
-            $criteria->addSelectColumn($alias . '.year');
-            $criteria->addSelectColumn($alias . '.idSubmitter');
         }
     }
 
@@ -370,7 +377,7 @@ class WineTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(WineTableMap::DATABASE_NAME)->getTable(WineTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(TastedWineTableMap::DATABASE_NAME)->getTable(TastedWineTableMap::TABLE_NAME);
     }
 
     /**
@@ -378,16 +385,16 @@ class WineTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(WineTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(WineTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new WineTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(TastedWineTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(TastedWineTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new TastedWineTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Wine or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a TastedWine or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Wine object or primary key or array of primary keys
+     * @param mixed               $values Criteria or TastedWine object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -398,27 +405,37 @@ class WineTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(WineTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TastedWineTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \WineTasting\Model\Wine) { // it's a model object
+        } elseif ($values instanceof \WineTasting\Model\TastedWine) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(WineTableMap::DATABASE_NAME);
-            $criteria->add(WineTableMap::COL_IDWINE, (array) $values, Criteria::IN);
+            $criteria = new Criteria(TastedWineTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(TastedWineTableMap::COL_IDUSER, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(TastedWineTableMap::COL_IDWINE, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = WineQuery::create()->mergeWith($criteria);
+        $query = TastedWineQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            WineTableMap::clearInstancePool();
+            TastedWineTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                WineTableMap::removeInstanceFromPool($singleval);
+                TastedWineTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -426,20 +443,20 @@ class WineTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the wine table.
+     * Deletes all rows from the tasted_wine table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return WineQuery::create()->doDeleteAll($con);
+        return TastedWineQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Wine or Criteria object.
+     * Performs an INSERT on the database, given a TastedWine or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Wine object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or TastedWine object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -448,22 +465,18 @@ class WineTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(WineTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TastedWineTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Wine object
-        }
-
-        if ($criteria->containsKey(WineTableMap::COL_IDWINE) && $criteria->keyContainsValue(WineTableMap::COL_IDWINE) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.WineTableMap::COL_IDWINE.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from TastedWine object
         }
 
 
         // Set the correct dbName
-        $query = WineQuery::create()->mergeWith($criteria);
+        $query = TastedWineQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -472,7 +485,7 @@ class WineTableMap extends TableMap
         });
     }
 
-} // WineTableMap
+} // TastedWineTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-WineTableMap::buildTableMap();
+TastedWineTableMap::buildTableMap();

@@ -13,10 +13,8 @@ class BaseController
 {
 
     /**
-     * Send json response.
-     *
-     * @param mixed $data
-     *            The response data
+     * @param $data
+     * @return JsonResponse
      */
     protected function json($data)
     {

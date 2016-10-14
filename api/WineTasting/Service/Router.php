@@ -17,7 +17,7 @@ class Router
     /**
      * Set up routes of the API.
      *
-     * @param \Silex\Application $app            
+     * @param \Silex\Application $app
      */
     public function constructRoutes(Application $app)
     {
@@ -27,17 +27,20 @@ class Router
     /**
      * Builds the routes that can be accesses all the time without being logged in.
      *
-     * @param Application $app            
+     * @param Application $app
      */
     private function constructPublicRoutes(Application $app)
     {
         // Home
         $app->get('/v1/', 'WineTasting\\Controller\\HomeController::info');
-        
+
         // User
         $app->post('/v1/user/register', 'WineTasting\\Controller\\UserController::register');
         $app->get('/v1/user/{id}/votes', 'WineTasting\\Controller\\UserController::getVotes');
-        
+        $app->get('/v1/user/{id}/tasted', 'WineTasting\\Controller\\UserController::getTasted');
+        $app->post('/v1/user/{id}/tasted/{idWine}', 'WineTasting\\Controller\\UserController::addTasted');
+        $app->delete('/v1/user/{id}/tasted/{idWine}', 'WineTasting\\Controller\\UserController::removeTasted');
+
         // Wine
         $app->get('/v1/wine', 'WineTasting\\Controller\\WineController::getWines');
         $app->get('/v1/wine/ranking', 'WineTasting\\Controller\\WineController::getRankedWines');
@@ -46,7 +49,7 @@ class Router
         $app->post('/v1/wine/vote1', 'WineTasting\\Controller\\WineController::vote1');
         $app->post('/v1/wine/vote2', 'WineTasting\\Controller\\WineController::vote2');
         $app->post('/v1/wine/vote3', 'WineTasting\\Controller\\WineController::vote3');
-        
+
         // Config
         $app->post('/v1/config/{name}', 'WineTasting\\Controller\\ConfigController::setValue');
         $app->get('/v1/config/{name}', 'WineTasting\\Controller\\ConfigController::getValue');

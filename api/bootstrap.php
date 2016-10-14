@@ -3,18 +3,19 @@ $config = __DIR__ . '/../config/api.yml';
 $autoload = __DIR__ . '/../vendor/autoload.php';
 
 // Check if config file is present. If not throw an error.
-if (! stream_resolve_include_path($config)) {
+if (!stream_resolve_include_path($config)) {
     throw new Exception('Config file ' . $config . ' not found! Create it from config/sample/api.yml.');
 }
 
 // Check if depenedencies are installed. If not throw an error.
-if (! stream_resolve_include_path($autoload)) {
+if (!stream_resolve_include_path($autoload)) {
     throw new Exception('Composer generated file ' . $autoload . ' not found! Execute <code>composer install</code>.');
 }
 
 require_once $autoload;
 
 use Symfony\Component\Yaml\Parser;
+
 $yaml = new Parser();
 $config = $yaml->parse(file_get_contents($config))['api'];
 
@@ -32,7 +33,7 @@ $app = new Silex\Application();
 $app['debug'] = $config['debug'];
 $app['http_cache'] = $config['httpCache'];
 $app['config'] = $config;
-$app['propel.model_path'] = __DIR__.'/WineTasting/Model';
+$app['propel.model_path'] = __DIR__ . '/WineTasting/Model';
 
 $app->register(new Propel\Silex\PropelServiceProvider(), [
     'propel.config_file' => __DIR__ . '/../build/generated/config.php'

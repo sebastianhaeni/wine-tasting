@@ -16,6 +16,8 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use WineTasting\Model\TastedWine as ChildTastedWine;
+use WineTasting\Model\TastedWineQuery as ChildTastedWineQuery;
 use WineTasting\Model\User as ChildUser;
 use WineTasting\Model\UserQuery as ChildUserQuery;
 use WineTasting\Model\Wine as ChildWine;
@@ -115,6 +117,22 @@ abstract class User implements ActiveRecordInterface
     protected $collWinesRelatedBySubmitterPartial;
 
     /**
+     * @var        ObjectCollection|ChildTastedWine[] Collection to store aggregation of ChildTastedWine objects.
+     */
+    protected $collTastedWines;
+    protected $collTastedWinesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildWine[] Cross Collection to store aggregation of ChildWine objects.
+     */
+    protected $collWines;
+
+    /**
+     * @var bool
+     */
+    protected $collWinesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -126,7 +144,19 @@ abstract class User implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildWine[]
      */
+    protected $winesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildWine[]
+     */
     protected $winesRelatedBySubmitterScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTastedWine[]
+     */
+    protected $tastedWinesScheduledForDeletion = null;
 
     /**
      * Initializes internal state of WineTasting\Model\Base\User object.
@@ -640,6 +670,9 @@ abstract class User implements ActiveRecordInterface
             $this->aWineRelatedByVote3 = null;
             $this->collWinesRelatedBySubmitter = null;
 
+            $this->collTastedWines = null;
+
+            $this->collWines = null;
         } // if (deep)
     }
 
@@ -776,6 +809,35 @@ abstract class User implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->winesScheduledForDeletion !== null) {
+                if (!$this->winesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    foreach ($this->winesScheduledForDeletion as $entry) {
+                        $entryPk = [];
+
+                        $entryPk[0] = $this->getIdUser();
+                        $entryPk[1] = $entry->getIdWine();
+                        $pks[] = $entryPk;
+                    }
+
+                    \WineTasting\Model\TastedWineQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+
+                    $this->winesScheduledForDeletion = null;
+                }
+
+            }
+
+            if ($this->collWines) {
+                foreach ($this->collWines as $wine) {
+                    if (!$wine->isDeleted() && ($wine->isNew() || $wine->isModified())) {
+                        $wine->save($con);
+                    }
+                }
+            }
+
+
             if ($this->winesRelatedBySubmitterScheduledForDeletion !== null) {
                 if (!$this->winesRelatedBySubmitterScheduledForDeletion->isEmpty()) {
                     \WineTasting\Model\WineQuery::create()
@@ -787,6 +849,23 @@ abstract class User implements ActiveRecordInterface
 
             if ($this->collWinesRelatedBySubmitter !== null) {
                 foreach ($this->collWinesRelatedBySubmitter as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->tastedWinesScheduledForDeletion !== null) {
+                if (!$this->tastedWinesScheduledForDeletion->isEmpty()) {
+                    \WineTasting\Model\TastedWineQuery::create()
+                        ->filterByPrimaryKeys($this->tastedWinesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->tastedWinesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTastedWines !== null) {
+                foreach ($this->collTastedWines as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1039,6 +1118,21 @@ abstract class User implements ActiveRecordInterface
 
                 $result[$key] = $this->collWinesRelatedBySubmitter->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collTastedWines) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'tastedWines';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'tasted_wines';
+                        break;
+                    default:
+                        $key = 'TastedWines';
+                }
+
+                $result[$key] = $this->collTastedWines->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1287,6 +1381,12 @@ abstract class User implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getTastedWines() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTastedWine($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1483,6 +1583,9 @@ abstract class User implements ActiveRecordInterface
     {
         if ('WineRelatedBySubmitter' == $relationName) {
             return $this->initWinesRelatedBySubmitter();
+        }
+        if ('TastedWine' == $relationName) {
+            return $this->initTastedWines();
         }
     }
 
@@ -1705,6 +1808,494 @@ abstract class User implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collTastedWines collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTastedWines()
+     */
+    public function clearTastedWines()
+    {
+        $this->collTastedWines = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTastedWines collection loaded partially.
+     */
+    public function resetPartialTastedWines($v = true)
+    {
+        $this->collTastedWinesPartial = $v;
+    }
+
+    /**
+     * Initializes the collTastedWines collection.
+     *
+     * By default this just sets the collTastedWines collection to an empty array (like clearcollTastedWines());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTastedWines($overrideExisting = true)
+    {
+        if (null !== $this->collTastedWines && !$overrideExisting) {
+            return;
+        }
+        $this->collTastedWines = new ObjectCollection();
+        $this->collTastedWines->setModel('\WineTasting\Model\TastedWine');
+    }
+
+    /**
+     * Gets an array of ChildTastedWine objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildUser is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTastedWine[] List of ChildTastedWine objects
+     * @throws PropelException
+     */
+    public function getTastedWines(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTastedWinesPartial && !$this->isNew();
+        if (null === $this->collTastedWines || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTastedWines) {
+                // return empty collection
+                $this->initTastedWines();
+            } else {
+                $collTastedWines = ChildTastedWineQuery::create(null, $criteria)
+                    ->filterByUser($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTastedWinesPartial && count($collTastedWines)) {
+                        $this->initTastedWines(false);
+
+                        foreach ($collTastedWines as $obj) {
+                            if (false == $this->collTastedWines->contains($obj)) {
+                                $this->collTastedWines->append($obj);
+                            }
+                        }
+
+                        $this->collTastedWinesPartial = true;
+                    }
+
+                    return $collTastedWines;
+                }
+
+                if ($partial && $this->collTastedWines) {
+                    foreach ($this->collTastedWines as $obj) {
+                        if ($obj->isNew()) {
+                            $collTastedWines[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTastedWines = $collTastedWines;
+                $this->collTastedWinesPartial = false;
+            }
+        }
+
+        return $this->collTastedWines;
+    }
+
+    /**
+     * Sets a collection of ChildTastedWine objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $tastedWines A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function setTastedWines(Collection $tastedWines, ConnectionInterface $con = null)
+    {
+        /** @var ChildTastedWine[] $tastedWinesToDelete */
+        $tastedWinesToDelete = $this->getTastedWines(new Criteria(), $con)->diff($tastedWines);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->tastedWinesScheduledForDeletion = clone $tastedWinesToDelete;
+
+        foreach ($tastedWinesToDelete as $tastedWineRemoved) {
+            $tastedWineRemoved->setUser(null);
+        }
+
+        $this->collTastedWines = null;
+        foreach ($tastedWines as $tastedWine) {
+            $this->addTastedWine($tastedWine);
+        }
+
+        $this->collTastedWines = $tastedWines;
+        $this->collTastedWinesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TastedWine objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TastedWine objects.
+     * @throws PropelException
+     */
+    public function countTastedWines(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTastedWinesPartial && !$this->isNew();
+        if (null === $this->collTastedWines || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTastedWines) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTastedWines());
+            }
+
+            $query = ChildTastedWineQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUser($this)
+                ->count($con);
+        }
+
+        return count($this->collTastedWines);
+    }
+
+    /**
+     * Method called to associate a ChildTastedWine object to this object
+     * through the ChildTastedWine foreign key attribute.
+     *
+     * @param  ChildTastedWine $l ChildTastedWine
+     * @return $this|\WineTasting\Model\User The current object (for fluent API support)
+     */
+    public function addTastedWine(ChildTastedWine $l)
+    {
+        if ($this->collTastedWines === null) {
+            $this->initTastedWines();
+            $this->collTastedWinesPartial = true;
+        }
+
+        if (!$this->collTastedWines->contains($l)) {
+            $this->doAddTastedWine($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTastedWine $tastedWine The ChildTastedWine object to add.
+     */
+    protected function doAddTastedWine(ChildTastedWine $tastedWine)
+    {
+        $this->collTastedWines[]= $tastedWine;
+        $tastedWine->setUser($this);
+    }
+
+    /**
+     * @param  ChildTastedWine $tastedWine The ChildTastedWine object to remove.
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function removeTastedWine(ChildTastedWine $tastedWine)
+    {
+        if ($this->getTastedWines()->contains($tastedWine)) {
+            $pos = $this->collTastedWines->search($tastedWine);
+            $this->collTastedWines->remove($pos);
+            if (null === $this->tastedWinesScheduledForDeletion) {
+                $this->tastedWinesScheduledForDeletion = clone $this->collTastedWines;
+                $this->tastedWinesScheduledForDeletion->clear();
+            }
+            $this->tastedWinesScheduledForDeletion[]= clone $tastedWine;
+            $tastedWine->setUser(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related TastedWines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildTastedWine[] List of ChildTastedWine objects
+     */
+    public function getTastedWinesJoinWine(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTastedWineQuery::create(null, $criteria);
+        $query->joinWith('Wine', $joinBehavior);
+
+        return $this->getTastedWines($query, $con);
+    }
+
+    /**
+     * Clears out the collWines collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addWines()
+     */
+    public function clearWines()
+    {
+        $this->collWines = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Initializes the collWines crossRef collection.
+     *
+     * By default this just sets the collWines collection to an empty collection (like clearWines());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initWines()
+    {
+        $this->collWines = new ObjectCollection();
+        $this->collWinesPartial = true;
+
+        $this->collWines->setModel('\WineTasting\Model\Wine');
+    }
+
+    /**
+     * Checks if the collWines collection is loaded.
+     *
+     * @return bool
+     */
+    public function isWinesLoaded()
+    {
+        return null !== $this->collWines;
+    }
+
+    /**
+     * Gets a collection of ChildWine objects related by a many-to-many relationship
+     * to the current object by way of the tasted_wine cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildUser is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildWine[] List of ChildWine objects
+     */
+    public function getWines(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collWinesPartial && !$this->isNew();
+        if (null === $this->collWines || null !== $criteria || $partial) {
+            if ($this->isNew()) {
+                // return empty collection
+                if (null === $this->collWines) {
+                    $this->initWines();
+                }
+            } else {
+
+                $query = ChildWineQuery::create(null, $criteria)
+                    ->filterByUser($this);
+                $collWines = $query->find($con);
+                if (null !== $criteria) {
+                    return $collWines;
+                }
+
+                if ($partial && $this->collWines) {
+                    //make sure that already added objects gets added to the list of the database.
+                    foreach ($this->collWines as $obj) {
+                        if (!$collWines->contains($obj)) {
+                            $collWines[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collWines = $collWines;
+                $this->collWinesPartial = false;
+            }
+        }
+
+        return $this->collWines;
+    }
+
+    /**
+     * Sets a collection of Wine objects related by a many-to-many relationship
+     * to the current object by way of the tasted_wine cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $wines A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function setWines(Collection $wines, ConnectionInterface $con = null)
+    {
+        $this->clearWines();
+        $currentWines = $this->getWines();
+
+        $winesScheduledForDeletion = $currentWines->diff($wines);
+
+        foreach ($winesScheduledForDeletion as $toDelete) {
+            $this->removeWine($toDelete);
+        }
+
+        foreach ($wines as $wine) {
+            if (!$currentWines->contains($wine)) {
+                $this->doAddWine($wine);
+            }
+        }
+
+        $this->collWinesPartial = false;
+        $this->collWines = $wines;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Wine objects related by a many-to-many relationship
+     * to the current object by way of the tasted_wine cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related Wine objects
+     */
+    public function countWines(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collWinesPartial && !$this->isNew();
+        if (null === $this->collWines || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collWines) {
+                return 0;
+            } else {
+
+                if ($partial && !$criteria) {
+                    return count($this->getWines());
+                }
+
+                $query = ChildWineQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByUser($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collWines);
+        }
+    }
+
+    /**
+     * Associate a ChildWine to this object
+     * through the tasted_wine cross reference table.
+     *
+     * @param ChildWine $wine
+     * @return ChildUser The current object (for fluent API support)
+     */
+    public function addWine(ChildWine $wine)
+    {
+        if ($this->collWines === null) {
+            $this->initWines();
+        }
+
+        if (!$this->getWines()->contains($wine)) {
+            // only add it if the **same** object is not already associated
+            $this->collWines->push($wine);
+            $this->doAddWine($wine);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param ChildWine $wine
+     */
+    protected function doAddWine(ChildWine $wine)
+    {
+        $tastedWine = new ChildTastedWine();
+
+        $tastedWine->setWine($wine);
+
+        $tastedWine->setUser($this);
+
+        $this->addTastedWine($tastedWine);
+
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$wine->isUsersLoaded()) {
+            $wine->initUsers();
+            $wine->getUsers()->push($this);
+        } elseif (!$wine->getUsers()->contains($this)) {
+            $wine->getUsers()->push($this);
+        }
+
+    }
+
+    /**
+     * Remove wine of this object
+     * through the tasted_wine cross reference table.
+     *
+     * @param ChildWine $wine
+     * @return ChildUser The current object (for fluent API support)
+     */
+    public function removeWine(ChildWine $wine)
+    {
+        if ($this->getWines()->contains($wine)) { $tastedWine = new ChildTastedWine();
+
+            $tastedWine->setWine($wine);
+            if ($wine->isUsersLoaded()) {
+                //remove the back reference if available
+                $wine->getUsers()->removeObject($this);
+            }
+
+            $tastedWine->setUser($this);
+            $this->removeTastedWine(clone $tastedWine);
+            $tastedWine->clear();
+
+            $this->collWines->remove($this->collWines->search($wine));
+
+            if (null === $this->winesScheduledForDeletion) {
+                $this->winesScheduledForDeletion = clone $this->collWines;
+                $this->winesScheduledForDeletion->clear();
+            }
+
+            $this->winesScheduledForDeletion->push($wine);
+        }
+
+
+        return $this;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -1748,9 +2339,21 @@ abstract class User implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collTastedWines) {
+                foreach ($this->collTastedWines as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collWines) {
+                foreach ($this->collWines as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collWinesRelatedBySubmitter = null;
+        $this->collTastedWines = null;
+        $this->collWines = null;
         $this->aWineRelatedByVote1 = null;
         $this->aWineRelatedByVote2 = null;
         $this->aWineRelatedByVote3 = null;

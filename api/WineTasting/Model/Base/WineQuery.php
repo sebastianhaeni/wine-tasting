@@ -52,7 +52,11 @@ use WineTasting\Model\Map\WineTableMap;
  * @method     ChildWineQuery rightJoinUserRelatedByVote3($relationAlias = null) Adds a RIGHT JOIN clause to the query using the UserRelatedByVote3 relation
  * @method     ChildWineQuery innerJoinUserRelatedByVote3($relationAlias = null) Adds a INNER JOIN clause to the query using the UserRelatedByVote3 relation
  *
- * @method     \WineTasting\Model\UserQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildWineQuery leftJoinTastedWine($relationAlias = null) Adds a LEFT JOIN clause to the query using the TastedWine relation
+ * @method     ChildWineQuery rightJoinTastedWine($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TastedWine relation
+ * @method     ChildWineQuery innerJoinTastedWine($relationAlias = null) Adds a INNER JOIN clause to the query using the TastedWine relation
+ *
+ * @method     \WineTasting\Model\UserQuery|\WineTasting\Model\TastedWineQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildWine findOne(ConnectionInterface $con = null) Return the first ChildWine matching the query
  * @method     ChildWine findOneOrCreate(ConnectionInterface $con = null) Return the first ChildWine matching the query, or a new ChildWine object populated from the query conditions when no match is found
@@ -737,6 +741,96 @@ abstract class WineQuery extends ModelCriteria
         return $this
             ->joinUserRelatedByVote3($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'UserRelatedByVote3', '\WineTasting\Model\UserQuery');
+    }
+
+    /**
+     * Filter the query by a related \WineTasting\Model\TastedWine object
+     *
+     * @param \WineTasting\Model\TastedWine|ObjectCollection $tastedWine the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildWineQuery The current query, for fluid interface
+     */
+    public function filterByTastedWine($tastedWine, $comparison = null)
+    {
+        if ($tastedWine instanceof \WineTasting\Model\TastedWine) {
+            return $this
+                ->addUsingAlias(WineTableMap::COL_IDWINE, $tastedWine->getIdWine(), $comparison);
+        } elseif ($tastedWine instanceof ObjectCollection) {
+            return $this
+                ->useTastedWineQuery()
+                ->filterByPrimaryKeys($tastedWine->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTastedWine() only accepts arguments of type \WineTasting\Model\TastedWine or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TastedWine relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildWineQuery The current query, for fluid interface
+     */
+    public function joinTastedWine($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TastedWine');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TastedWine');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TastedWine relation TastedWine object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \WineTasting\Model\TastedWineQuery A secondary query class using the current class as primary query
+     */
+    public function useTastedWineQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTastedWine($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TastedWine', '\WineTasting\Model\TastedWineQuery');
+    }
+
+    /**
+     * Filter the query by a related User object
+     * using the tasted_wine table as cross reference
+     *
+     * @param User $user the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildWineQuery The current query, for fluid interface
+     */
+    public function filterByUser($user, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useTastedWineQuery()
+            ->filterByUser($user, $comparison)
+            ->endUse();
     }
 
     /**

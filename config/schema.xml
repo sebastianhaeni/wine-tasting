@@ -14,85 +14,98 @@
           filenames end with schema.xml.
 -->
 <database
-  name="default"
-  defaultIdMethod="native"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd"
-  namespace="WineTasting\Model"
-  defaultPhpNamingMethod="underscore">
+		name="default"
+		defaultIdMethod="native"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd"
+		namespace="WineTasting\Model"
+		defaultPhpNamingMethod="underscore">
 
-  <!-- Within the <database> tag, Propel expects one <table> tag for each table -->
+	<!-- Within the <database> tag, Propel expects one <table> tag for each table -->
 
-  <!--
-      Each table element should have a `name` attribute. It will be used for naming the sql table.
+	<!--
+		Each table element should have a `name` attribute. It will be used for naming the sql table.
 
-      The `phpName` is the name that Propel will use for the generated PHP class. By default, Propel uses a
-      CamelCase version of the table name as its phpName - that means that you could omit the `phpName` attribute
-      on our `book` table.
-  -->
-  <table name="wine" idMethod="native" phpName="Wine">
+		The `phpName` is the name that Propel will use for the generated PHP class. By default, Propel uses a
+		CamelCase version of the table name as its phpName - that means that you could omit the `phpName` attribute
+		on our `book` table.
+	-->
+	<table name="wine" idMethod="native" phpName="Wine">
 
-    <!--
-        Each column has a `name` (the one used by the database), and an optional `phpName` attribute. Once again,
-        the Propel default behavior is to use a CamelCase version of the name as `phpName` when not specified.
+		<!--
+			Each column has a `name` (the one used by the database), and an optional `phpName` attribute. Once again,
+			the Propel default behavior is to use a CamelCase version of the name as `phpName` when not specified.
 
-        Each column also requires a `type`. The XML schema is database agnostic, so the column types and attributes
-        are probably not exactly the same as the one you use in your own database. But Propel knows how to map the
-        schema types with SQL types for many database vendors. Existing Propel column types are:
-        `boolean`, `tinyint`, `smallint`, `integer`, `bigint`, `double`, `float`, `real`, `decimal`, `char`,
-        `varchar`, `longvarchar`, `date`, `time`, `timestamp`, `blob`, `clob`, `object`, and `array`.
+			Each column also requires a `type`. The XML schema is database agnostic, so the column types and attributes
+			are probably not exactly the same as the one you use in your own database. But Propel knows how to map the
+			schema types with SQL types for many database vendors. Existing Propel column types are:
+			`boolean`, `tinyint`, `smallint`, `integer`, `bigint`, `double`, `float`, `real`, `decimal`, `char`,
+			`varchar`, `longvarchar`, `date`, `time`, `timestamp`, `blob`, `clob`, `object`, and `array`.
 
-        Some column types use a size (like `varchar` and `int`), some have unlimited size (`longvarchar`, `clob`,
-        `blob`).
+			Some column types use a size (like `varchar` and `int`), some have unlimited size (`longvarchar`, `clob`,
+			`blob`).
 
-        Check the (schema reference)[http://propelorm.org/reference/schema.html] for more details
-        on each column type.
+			Check the (schema reference)[http://propelorm.org/reference/schema.html] for more details
+			on each column type.
 
-        As for the other column attributes, `required`, `primaryKey`, and `autoIncrement`, they mean exactly
-        what their names imply.
-    -->
+			As for the other column attributes, `required`, `primaryKey`, and `autoIncrement`, they mean exactly
+			what their names imply.
+		-->
 
-    <column name="idWine" phpName="IdWine" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="name" phpName="Name" type="VARCHAR" size="200" required="true"/>
-    <column name="picture" phpName="Picture" type="VARCHAR" size="200" required="true"/>
-    <column name="year" phpName="Year" type="SMALLINT" required="true"/>
-    <column name="idSubmitter" phpName="Submitter" type="INTEGER" required="true"/>
+		<column name="idWine" phpName="IdWine" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+		<column name="name" phpName="Name" type="VARCHAR" size="200" required="true"/>
+		<column name="picture" phpName="Picture" type="VARCHAR" size="200" required="true"/>
+		<column name="year" phpName="Year" type="SMALLINT" required="true"/>
+		<column name="idSubmitter" phpName="Submitter" type="INTEGER" required="true"/>
 
-    <foreign-key foreignTable="user" onDelete="CASCADE" onUpdate="CASCADE" name="wine_fk_1">
-        <reference local="idSubmitter" foreign="idUser"/>
-    </foreign-key>
-    <index name="idSubmitter">
-        <index-column name="idSubmitter"/>
-    </index>
-  </table>
+		<foreign-key foreignTable="user" onDelete="CASCADE" onUpdate="CASCADE" name="wine_fk_1">
+			<reference local="idSubmitter" foreign="idUser"/>
+		</foreign-key>
+		<index name="idSubmitter">
+			<index-column name="idSubmitter"/>
+		</index>
+	</table>
 
-  <table name="user" idMethod="native" phpName="User">
-    <column name="idUser" phpName="IdUser" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="name" phpName="Name" type="VARCHAR" size="200" required="true"/>
+	<table name="user" idMethod="native" phpName="User">
+		<column name="idUser" phpName="IdUser" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+		<column name="name" phpName="Name" type="VARCHAR" size="200" required="true"/>
 
-    <column name="vote1" phpName="Vote1" type="INTEGER" required="false"/>
-    <column name="vote2" phpName="Vote2" type="INTEGER" required="false"/>
-    <column name="vote3" phpName="Vote3" type="INTEGER" required="false"/>
+		<column name="vote1" phpName="Vote1" type="INTEGER" required="false"/>
+		<column name="vote2" phpName="Vote2" type="INTEGER" required="false"/>
+		<column name="vote3" phpName="Vote3" type="INTEGER" required="false"/>
 
-    <foreign-key foreignTable="wine" onDelete="SETNULL" onUpdate="SETNULL" name="user_fk_1">
-        <reference local="vote1" foreign="idWine"/>
-    </foreign-key>
-    <foreign-key foreignTable="wine" onDelete="SETNULL" onUpdate="SETNULL" name="user_fk_2">
-        <reference local="vote2" foreign="idWine"/>
-    </foreign-key>
-    <foreign-key foreignTable="wine" onDelete="SETNULL" onUpdate="SETNULL" name="user_fk_3">
-        <reference local="vote3" foreign="idWine"/>
-    </foreign-key>
-  </table>
+		<foreign-key foreignTable="wine" onDelete="SETNULL" onUpdate="SETNULL" name="user_fk_1">
+			<reference local="vote1" foreign="idWine"/>
+		</foreign-key>
+		<foreign-key foreignTable="wine" onDelete="SETNULL" onUpdate="SETNULL" name="user_fk_2">
+			<reference local="vote2" foreign="idWine"/>
+		</foreign-key>
+		<foreign-key foreignTable="wine" onDelete="SETNULL" onUpdate="SETNULL" name="user_fk_3">
+			<reference local="vote3" foreign="idWine"/>
+		</foreign-key>
+	</table>
 
-  <table name="config" idMethod="native" phpName="Config">
-      <column name="idConfig" phpName="IdConfig" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-      <column name="name" phpName="Name" type="VARCHAR" size="200" required="true"/>
-      <column name="value" phpName="Value" type="VARCHAR" size="200" required="false"/>
+	<table name="tasted_wine" idMethod="native" phpName="TastedWine" isCrossRef="true">
+		<column name="idUser" phpName="IdUser" type="INTEGER" primaryKey="true" required="true"/>
+		<column name="idWine" phpName="IdWine" type="INTEGER" primaryKey="true" required="true"/>
 
-      <unique>
-        <unique-column name="name"/>
-      </unique>
-  </table>
+		<foreign-key foreignTable="user" onDelete="CASCADE" onUpdate="CASCADE" name="tasted_wine_fk1">
+			<reference local="idUser" foreign="idUser"/>
+		</foreign-key>
+		<foreign-key foreignTable="wine" onDelete="CASCADE" onUpdate="CASCADE" name="tasted_wine_fk2">
+			<reference local="idWine" foreign="idWine"/>
+		</foreign-key>
+	</table>
+
+	<table name="config" idMethod="native" phpName="Config">
+		<column name="idConfig" phpName="IdConfig" type="INTEGER" primaryKey="true" autoIncrement="true"
+				required="true"/>
+		<column name="name" phpName="Name" type="VARCHAR" size="200" required="true"/>
+		<column name="value" phpName="Value" type="VARCHAR" size="200" required="false"/>
+
+		<unique>
+			<unique-column name="name"/>
+		</unique>
+	</table>
 
 </database>
