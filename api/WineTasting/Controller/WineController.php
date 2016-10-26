@@ -180,6 +180,7 @@ class WineController extends BaseController
 
         // Create the new image (still blank/empty)
         $newImage = imagecreatetruecolor($newWidth, $newHeight);
+        imagesetinterpolation($newImage, IMG_SINC);
 
         // Determine the source image Dimensions
         $sourceImageWidth = imagesx($sourceImage);
@@ -205,7 +206,7 @@ class WineController extends BaseController
         // Save new image to destination path
         switch (exif_imagetype($sourcePath)) {
             case IMAGETYPE_JPEG :
-                imagejpeg($newImage, $sourcePath, 90);
+                imagejpeg($newImage, $sourcePath, 100);
                 break;
             case IMAGETYPE_PNG :
                 imagepng($newImage, $sourcePath);
