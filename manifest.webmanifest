@@ -3,10 +3,11 @@
   "short_name": "Wine Tasting",
   "start_url": "/voting.html",
   "display": "standalone",
-  "background_color": "#445863",
+  "theme_color": "#445863",
+  "background_color": "#fff",
   "description": "Vote for your favorite Wine at the Tasting of your Friend.",
   "icons": [{
-    "src": "images/icon.png",
+    "src": "images/homescreen.png",
     "sizes": "512x512",
     "type": "image/png"
   }]
